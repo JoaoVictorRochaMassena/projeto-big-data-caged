@@ -12,7 +12,7 @@ Com Python 3.12, as dependências de `requirements.txt` e a conta de leitura con
 python -m streamlit run dashboard/app.py --server.address localhost
 ```
 
-O painel consulta diretamente o PostgreSQL já provisionado no Aiven. A execução local atende ao item 2 do enunciado sem infraestrutura adicional. Alterar os filtros gera consultas parametrizadas, e **Atualizar dados** refaz a consulta. As capturas abaixo servem de apoio se a conexão ficar indisponível durante a apresentação. [Guia do painel](documentacao/DASHBOARD.md)
+O painel consulta diretamente o PostgreSQL já provisionado no Aiven. A execução local atende ao item 2 do enunciado sem infraestrutura adicional. Alterar os filtros gera consultas parametrizadas, e **Atualizar dados** refaz a consulta. As capturas abaixo servem de apoio se a conexão ficar indisponível durante a apresentação.
 
 ![Painel conectado ao Aiven exibindo o saldo mensal e os filtros](documentacao/capturas/saldo.png)
 
@@ -27,7 +27,7 @@ O painel consulta diretamente o PostgreSQL já provisionado no Aiven. A execuç�
 | **Salário de admissão** | Soma dos salários válidos dividida pela quantidade de salários válidos, somente em admissões, por sexo e raça/cor. A tabela mostra o percentual da maior média do recorte e a quantidade de salários usada. |
 | **Participação por setor** | Percentual de mulheres e de pessoas negras em cada fluxo. Pessoas negras correspondem às categorias preta e parda. A série de mulheres responde ao filtro de raça/cor. A série de pessoas negras responde ao filtro de sexo. |
 
-Filtros de competência, região, UF, seção CNAE, sexo, raça/cor e faixa etária. **Não informada** e **Não identificado** aparecem como categorias separadas. A documentação detalha pesos, denominadores e regras para ausência de dados. [Metodologia](documentacao/INDICADORES.md)
+Filtros de competência, região, UF, seção CNAE, sexo, raça/cor e faixa etária. **Não informada** e **Não identificado** aparecem como categorias separadas.
 
 ## Resultados e limites
 
@@ -91,7 +91,7 @@ O R coordena o processo e o DuckDB lê um mês por vez, limitando memória e evi
 | Registros aparentemente repetidos | Não remover: podem representar eventos distintos e não há identificador individual para deduplicação segura |
 | Volume elevado | Agregar pelas dimensões de análise, conservando contagens e soma salarial para recompor indicadores |
 
-A notação científica é matematicamente válida. Sua exclusão da média é uma regra explícita desta versão, motivada pela revisão dos valores extremos encontrados; não significa que todo valor nesse formato seja incorreto. A auditoria publicada contém **21 ocorrências**, derivadas dos arquivos históricos de anomalias e vinculadas ao pacote por hashes.
+A notação científica é matematicamente válida. Sua exclusão da média é uma regra explícita desta versão, motivada pela revisão dos valores extremos encontrados; não significa que todo valor nesse formato seja incorreto. A auditoria publicada contém **21 ocorrências**, registradas em `dados/auditoria_salarios.csv` e vinculadas ao pacote por hashes.
 
 São conferidos hashes, 12 competências, unicidade de IDs e grupos, equivalência entre eventos de origem e contagens agregadas, `saldo = admissoes - desligamentos` e os limites das contagens salariais.
 
@@ -104,8 +104,28 @@ São conferidos hashes, 12 competências, unicidade de IDs e grupos, equivalênc
 | Fase 3 | Validação e carga em Python com infraestrutura versionada. | Psycopg passou a enviar o CSV por `COPY` transacional. O serviço Free existente no Aiven foi importado para o Terraform. |
 | Entrega final | Painel interseccional e demonstração. | Aiven permaneceu como provedor. Streamlit e Plotly consultam a view PostgreSQL por TLS, com filtros, detalhamento e quatro indicadores. |
 
-## Reprodução, testes e segurança
+## Execução
 
-- **Tratamento e carga.** R com DBI, DuckDB, digest e jsonlite. Python com DuckDB e Psycopg valida e carrega a base. Terraform gerencia o serviço no Aiven. [Implantação e carga](documentacao/GUIA_IMPLANTACAO.md)
-- **Testes.** Execute `python -m unittest discover -s testes -p "test_*.py" -v`. Para os testes de leitura, configure `PG*` e `CAGED_TESTE_DASHBOARD=1` e repita o comando.
-- **Segurança.** O painel usa TLS `verify-full` e uma conta de leitura da view. `.env`, token, CA local, variáveis privadas, state e planos Terraform ficam fora do Git. Rode `python codigo/verificar_segredos.py` para verificar o índice antes do envio. [Gestão de acessos](documentacao/SEGURANCA.md)
+Ferramentas: Python 3.12 com `requirements.txt`, R com DBI, DuckDB, digest e jsonlite (somente para refazer o tratamento) e Terraform com o provider Aiven. Na raiz do projeto, no PowerShell:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Rscript codigo/executar.R tratamento
+.\.venv\Scripts\python.exe codigo/executar.py validar
+.\infraestrutura\configurar_token.ps1
+terraform -chdir=infraestrutura apply
+.\codigo\configurar_conexao.ps1
+.\.venv\Scripts\python.exe codigo/executar.py carga
+.\.venv\Scripts\python.exe -m streamlit run dashboard/app.py --server.address localhost
+```
+
+1. **Tratamento.** `executar.R tratamento` lê os 12 TXT colocados em `dados_originais/` e gera a base agregada. Pode ser pulado: a base tratada já está em `resultados/base_tratada.zip`.
+2. **Validação.** `executar.py validar` confere hash, totais mensais e consistência da base.
+3. **Infraestrutura.** O token Aiven é pedido com entrada oculta e o Terraform provisiona o PostgreSQL Free com filtro de IPs, usando um `terraform.tfvars` privado criado a partir de `terraform.tfvars.example`.
+4. **Carga.** Com host, porta, banco, usuário, senha e CA informados no prompt, `executar.py carga` cria o schema `caged` e envia a base por `COPY` em uma transação. `executar.py verificar-nuvem` repete a conferência no banco e grava `verificacoes/carga_nuvem.json`.
+5. **Painel.** O Streamlit consulta o PostgreSQL diretamente com a conta de leitura `caged_dashboard`, criada conforme `sql/permissoes_dashboard.sql`.
+
+## Segurança
+
+O painel usa TLS `verify-full` e uma conta de leitura da view. `.env`, token, CA local, variáveis privadas, state e planos Terraform ficam fora do Git. Rode `python codigo/verificar_segredos.py` para verificar o índice antes do envio. [Gestão de acessos](documentacao/SEGURANCA.md)

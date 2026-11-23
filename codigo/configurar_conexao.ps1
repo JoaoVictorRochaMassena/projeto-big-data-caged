@@ -11,4 +11,4 @@ try {
 } finally {
     $senhaSegura.Dispose()
 }
-Write-Output 'Conexao configurada nesta janela. Verifique com python codigo/diagnosticar_conexao.py.'
+Write-Output 'Conexao configurada nesta janela.'
