@@ -6,13 +6,17 @@ O painel investiga quem entra e sai do emprego formal e como o salário de admis
 
 ## Abrir o painel
 
-Com Python 3.12, as dependências de `requirements.txt` e a conta de leitura configurada, execute na raiz:
+**Painel publicado:** https://caged-emprego-ods.streamlit.app
+
+Para executar localmente, com Python 3.12, as dependências de `requirements.txt` e a conta de leitura configurada, execute na raiz:
 
 ```sh
 python -m streamlit run dashboard/app.py --server.address localhost
 ```
 
-O painel consulta diretamente o PostgreSQL já provisionado no Aiven. A execução local atende ao item 2 do enunciado sem infraestrutura adicional. Alterar os filtros gera consultas parametrizadas ao banco. As capturas abaixo servem de apoio se a conexão ficar indisponível durante a apresentação.
+O painel consulta diretamente o PostgreSQL já provisionado no Aiven. Alterar os filtros gera consultas parametrizadas ao banco. As capturas abaixo servem de apoio se a conexão ficar indisponível durante a apresentação.
+
+A publicação usa o Streamlit Community Cloud a partir deste repositório, com `dashboard/app.py` como arquivo principal e Python 3.12. Host, porta, banco, usuário `caged_dashboard`, senha e o certificado CA (`PGSSLROOTCERT_PEM`) ficam nos segredos da plataforma, fora do Git. Os IPs de saída do Streamlit Community Cloud, publicados na documentação da plataforma, foram incluídos na lista de acesso do serviço no Aiven, que continua exigindo TLS e senha.
 
 ![Painel conectado ao Aiven exibindo o saldo mensal e os filtros](documentacao/capturas/saldo.png)
 
