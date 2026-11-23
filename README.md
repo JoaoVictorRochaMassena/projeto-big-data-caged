@@ -8,7 +8,18 @@ O painel investiga quem entra e sai do emprego formal e como o salário de admis
 
 **Painel publicado:** https://caged-emprego-ods.streamlit.app
 
-Para executar localmente, com Python 3.12, as dependências de `requirements.txt` e a conta de leitura configurada, execute na raiz:
+Para executar localmente, use Python 3.12 com as dependências de `requirements.txt` e defina a conexão da conta de leitura em variáveis de ambiente ou num arquivo `.env` na raiz, que fica fora do Git:
+
+```
+PGHOST=
+PGPORT=5432
+PGDATABASE=
+PGUSER=
+PGPASSWORD=
+PGSSLROOTCERT=
+```
+
+`PGSSLROOTCERT` é o caminho local do certificado CA do Aiven. Em hospedagens sem arquivo local, use `PGSSLROOTCERT_PEM` com o conteúdo do certificado. O script `codigo/configurar_conexao.ps1` preenche essas variáveis na sessão do PowerShell, com a senha digitada de forma oculta. Depois execute na raiz:
 
 ```sh
 python -m streamlit run dashboard/app.py --server.address localhost
