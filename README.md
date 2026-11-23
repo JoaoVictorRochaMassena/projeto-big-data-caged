@@ -12,7 +12,7 @@ Com Python 3.12, as dependências de `requirements.txt` e a conta de leitura con
 python -m streamlit run dashboard/app.py --server.address localhost
 ```
 
-O painel consulta diretamente o PostgreSQL já provisionado no Aiven. A execução local atende ao item 2 do enunciado sem infraestrutura adicional. Alterar os filtros gera consultas parametrizadas, e **Atualizar dados** refaz a consulta. As capturas abaixo servem de apoio se a conexão ficar indisponível durante a apresentação.
+O painel consulta diretamente o PostgreSQL já provisionado no Aiven. A execução local atende ao item 2 do enunciado sem infraestrutura adicional. Alterar os filtros gera consultas parametrizadas ao banco. As capturas abaixo servem de apoio se a conexão ficar indisponível durante a apresentação.
 
 ![Painel conectado ao Aiven exibindo o saldo mensal e os filtros](documentacao/capturas/saldo.png)
 

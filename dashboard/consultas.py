@@ -143,7 +143,7 @@ def consultar(comando, parametros=None):
     try:
         with conectar() as conn, conn.transaction():
             conn.execute("SET TRANSACTION READ ONLY")
-            conn.execute("SET LOCAL statement_timeout = '20s'")
+            conn.execute("SET LOCAL statement_timeout = '60s'")
             return conn.execute(comando, parametros).fetchall()
     except psycopg.Error:
         raise ErroValidacao("Não foi possível consultar os indicadores no PostgreSQL.") from None

@@ -29,7 +29,7 @@ PAINEIS = {
 TZ = ZoneInfo("America/Bahia")
 
 
-@st.cache_data(ttl=300, max_entries=1, show_spinner=False)
+@st.cache_data(ttl=3600, max_entries=1, show_spinner=False)
 def catalogo():
     return pd.DataFrame(consultar(CATALOGO))
 
@@ -75,7 +75,7 @@ def filtros(dados):
 
 def mostrar_erro():
     st.error("Não foi possível consultar o banco de dados agora.")
-    st.caption("Verifique se o serviço PostgreSQL está ativo e se a conexão desta aplicação está autorizada. Use Atualizar dados para tentar novamente.")
+    st.caption("Verifique se o serviço PostgreSQL está ativo e se a conexão desta aplicação está autorizada. Recarregue a página para tentar novamente.")
 
 
 def main():
@@ -95,10 +95,6 @@ def main():
     )
     st.title("Emprego formal em movimento")
     st.caption("Admissões, desligamentos e salários no Brasil por sexo e raça/cor.")
-
-    if st.sidebar.button("Atualizar dados", icon=":material/refresh:", width="stretch"):
-        catalogo.clear()
-        resultado.clear()
 
     try:
         dados_catalogo = catalogo()
@@ -128,14 +124,6 @@ def main():
         f"Fonte: Novo CAGED/MTE · arquivos MOV · última consulta para este recorte às "
         f"{consultado_em:%H:%M:%S} (Bahia)."
     )
-    with st.expander("Como interpretar os dados"):
-        st.markdown(
-            "O recorte abrange movimentações do emprego formal. A razão desligamentos/admissões "
-            "é uma medida de fluxo, pois os arquivos MOV não trazem estoque de vínculos. "
-            "**Não identificado** e **Não informada** são categorias distintas de raça/cor. "
-            "A comparação salarial é descritiva e a base agregada carece de controles "
-            "por ocupação ou escolaridade."
-        )
 
 
 if __name__ == "__main__":
