@@ -20,7 +20,7 @@ A conexão Python usa `sslmode=verify-full`, certificado CA e confirmação de T
 
 O schema, tabelas e view têm privilégios de `PUBLIC` revogados. A carga inicial usa a conta fornecida pelo serviço. Para acesso futuro por aplicações, criar usuário separado e conceder somente leitura da view conforme a necessidade; não compartilhar o usuário administrativo com aplicações ou avaliadores.
 
-O painel usa `caged_dashboard`, com leitura da view e transações somente leitura. Guarde o arquivo dotenv privado fora de pastas sincronizadas e indique seu caminho em `CAGED_ENV_FILE`, ou use o cofre de segredos da hospedagem. O verificador de segredos examina o índice Git e o empacotador examina os arquivos de texto selecionados para o envio. Os dois reportam caminhos de arquivos. [Permissões do painel](../sql/permissoes_dashboard.sql)
+O painel usa `caged_dashboard`, com leitura da view e transações somente leitura. Guarde o arquivo dotenv privado fora de pastas sincronizadas e indique seu caminho em `CAGED_ENV_FILE`, ou use o cofre de segredos da hospedagem. O verificador de segredos examina o índice Git e reporta apenas caminhos de arquivos. [Permissões do painel](../sql/permissoes_dashboard.sql)
 
 O `.gitignore` exclui `.Renviron`, `.env`, `segredos/`, `*.tfvars`, `*.tfstate*`, planos, chaves, `.venv/` e caches Python. Os exemplos e os locks de dependências podem ser publicados. A exclusão pelo Git não protege arquivos já publicados anteriormente, arquivos enviados manualmente ou o armazenamento local.
 

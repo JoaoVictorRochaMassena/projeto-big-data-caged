@@ -31,21 +31,6 @@ def caminho_privado(caminho):
     )
 
 
-def verificar_conteudo(raiz, arquivos):
-    problemas = []
-    for arquivo in arquivos:
-        caminho = arquivo.relative_to(raiz).as_posix()
-        if caminho_privado(caminho):
-            problemas.append(caminho)
-            continue
-        if arquivo.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp", ".pdf", ".zip"}:
-            continue
-        texto = arquivo.read_text(encoding="utf-8-sig", errors="replace")
-        if BUSCA.search(texto):
-            problemas.append(caminho)
-    return sorted(set(problemas))
-
-
 def verificar_indice(raiz: Path):
     argumentos = ["git", "-C", str(raiz)]
     arquivos = subprocess.check_output([*argumentos, "ls-files", "--cached", "-z"])

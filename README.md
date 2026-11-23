@@ -75,6 +75,26 @@ O Aiven Free existente foi reconciliado com o state privado do Terraform. O ajus
 
 A base usa microdados públicos do MTE. A entrega publica agregados e metadados, com um recorte sem identificadores individuais e aderente à finalidade acadêmica. O pipeline preserva eventos semelhantes, pois os dados carecem de identificador para deduplicação segura. [Fonte oficial Novo CAGED/PDET](https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/microdados-rais-e-caged) · [Proveniência e hashes](dados/arquivos_origem.csv)
 
+## Tratamento e justificativas
+
+O R coordena o processo e o DuckDB lê um mês por vez, limitando memória e evitando carregar todos os TXT simultaneamente. Os SQLs em `sql/` concentram as regras de transformação.
+
+| Característica ou problema | Decisão e justificativa |
+| --- | --- |
+| Espaços, vazios e cabeçalhos acentuados | Remover espaços laterais, converter vazios em nulos e padronizar nomes após conferir o cabeçalho esperado |
+| Códigos categóricos numéricos | Preservar como texto e traduzir por dicionário, evitando perder a representação ou inventar rótulos |
+| Competência divergente do arquivo | Interromper; quando ausente, preencher pelo mês identificado no nome do arquivo |
+| Idades ausentes ou fora de 14 a 100 | Manter o evento na faixa `Nao informado ou invalido`; esse intervalo é uma decisão analítica da equipe |
+| Salários com vírgula e separadores de milhar | Converter formatos decimais aceitos com até seis casas; utilizar soma decimal para preservar precisão |
+| Salários negativos, inválidos ou em notação científica | Preservar o evento nas contagens; retirar o salário da média. Formatos recusados ficam na auditoria para revisão na fonte |
+| Salário igual a zero | Incluir na média, mantendo a regra já adotada na etapa anterior |
+| Registros aparentemente repetidos | Não remover: podem representar eventos distintos e não há identificador individual para deduplicação segura |
+| Volume elevado | Agregar pelas dimensões de análise, conservando contagens e soma salarial para recompor indicadores |
+
+A notação científica é matematicamente válida. Sua exclusão da média é uma regra explícita desta versão, motivada pela revisão dos valores extremos encontrados; não significa que todo valor nesse formato seja incorreto. A auditoria publicada contém **21 ocorrências**, derivadas dos arquivos históricos de anomalias e vinculadas ao pacote por hashes.
+
+São conferidos hashes, 12 competências, unicidade de IDs e grupos, equivalência entre eventos de origem e contagens agregadas, `saldo = admissoes - desligamentos` e os limites das contagens salariais.
+
 ## Evolução do projeto
 
 | Etapa | Planejamento ou entrega | Evolução e motivo |
@@ -87,6 +107,5 @@ A base usa microdados públicos do MTE. A entrega publica agregados e metadados,
 ## Reprodução, testes e segurança
 
 - **Tratamento e carga.** R com DBI, DuckDB, digest e jsonlite. Python com DuckDB e Psycopg valida e carrega a base. Terraform gerencia o serviço no Aiven. [Implantação e carga](documentacao/GUIA_IMPLANTACAO.md)
-- **Testes.** Execute `python -m unittest discover -s testes -p "test_*.py" -v`. Para os testes de leitura, configure `PG*` e `CAGED_TESTE_DASHBOARD=1` e repita o comando. [Evidências e instruções](documentacao/VALIDACAO.md)
+- **Testes.** Execute `python -m unittest discover -s testes -p "test_*.py" -v`. Para os testes de leitura, configure `PG*` e `CAGED_TESTE_DASHBOARD=1` e repita o comando.
 - **Segurança.** O painel usa TLS `verify-full` e uma conta de leitura da view. `.env`, token, CA local, variáveis privadas, state e planos Terraform ficam fora do Git. Rode `python codigo/verificar_segredos.py` para verificar o índice antes do envio. [Gestão de acessos](documentacao/SEGURANCA.md)
-- **Apresentação.** [Roteiro de 10 minutos](documentacao/PITCH.md)

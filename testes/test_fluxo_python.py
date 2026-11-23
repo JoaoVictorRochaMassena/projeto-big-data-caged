@@ -13,7 +13,6 @@ sys.path.insert(0, str(RAIZ / "codigo"))
 from caged.validacao import (MESES, TIPOS_BASE, COLUNAS_ARQUIVOS, COLUNAS_AUDITORIA,
     COLUNAS_DICIONARIO, ErroValidacao, sha256, validar_base)
 from caged.banco import parametros_conexao
-from preparar_envio import selecionar_arquivos, gerar_pacote
 
 
 def csv_escrever(path, colunas, linhas):
@@ -125,24 +124,6 @@ class TesteFluxoPython(unittest.TestCase):
         ambiente["PGSSLROOTCERT"] = str(self.raiz / "referencias/dicionarios.csv")
         parametros = parametros_conexao(ambiente)
         self.assertEqual(parametros["sslmode"], "verify-full")
-
-    def test_pacote_nao_inclui_segredos_state_venv_ou_csv_expandido(self):
-        for nome in (".env", "infraestrutura/terraform.tfvars", "infraestrutura/terraform.tfstate",
-                     "infraestrutura/.terraform/arquivo.tf", ".venv/segredo.py", "segredos/senha.py"):
-            path = self.raiz / nome
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text("nao publicar", encoding="utf-8")
-        selecionados = {p.relative_to(self.raiz).as_posix() for p in selecionar_arquivos(self.raiz)}
-        self.assertNotIn("resultados/base_tratada.csv", selecionados)
-        self.assertNotIn("infraestrutura/terraform.tfvars", selecionados)
-        self.assertNotIn("infraestrutura/terraform.tfstate", selecionados)
-        self.assertFalse(any(".venv" in n or "segredos" in n or ".terraform/" in n for n in selecionados))
-        self.assertNotIn(".env", selecionados)
-
-    def test_envio_final_bloqueado_sem_evidencia_real(self):
-        with self.assertRaisesRegex(ErroValidacao, "Falta a evidencia real de nuvem"):
-            gerar_pacote(self.raiz, self.raiz / "envio.zip")
-        self.assertFalse((self.raiz / "envio.zip").exists())
 
 
 if __name__ == "__main__":
