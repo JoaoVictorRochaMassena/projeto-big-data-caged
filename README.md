@@ -126,7 +126,7 @@ terraform -chdir=infraestrutura apply
 
 1. **Tratamento.** `executar.R tratamento` lê os 12 TXT colocados em `dados_originais/` e gera a base agregada. Pode ser pulado: a base tratada já está em `resultados/base_tratada.zip`.
 2. **Validação.** `executar.py validar` confere hash, totais mensais e consistência da base.
-3. **Infraestrutura.** O token Aiven é pedido com entrada oculta e o Terraform provisiona o PostgreSQL Free com filtro de IPs, usando um `terraform.tfvars` privado criado a partir de `terraform.tfvars.example`.
+3. **Infraestrutura.** O token Aiven é pedido com entrada oculta e o Terraform provisiona o PostgreSQL Free com filtro de IPs, usando um `terraform.tfvars` privado com o nome do projeto no Aiven e os IPs liberados.
 4. **Carga.** Com host, porta, banco, usuário, senha e CA informados no prompt, `executar.py carga` cria o schema `caged` e envia a base por `COPY` em uma transação. `executar.py verificar-nuvem` repete a conferência no banco e grava `verificacoes/carga_nuvem.json`.
 5. **Painel.** O Streamlit consulta o PostgreSQL diretamente com a conta de leitura `caged_dashboard`, criada conforme `sql/permissoes_dashboard.sql`.
 

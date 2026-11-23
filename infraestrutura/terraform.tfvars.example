@@ -1,4 +1,0 @@
-project_name  = "SUBSTITUA_PELO_PROJETO_DA_EQUIPE"
-service_name  = "caged-postgres"
-plan          = "free-1-1gb"
-allowed_cidrs = ["203.0.113.10/32"]
