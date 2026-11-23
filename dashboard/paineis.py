@@ -58,7 +58,7 @@ def turnover(dados):
     recorte["razao"] = pd.to_numeric(recorte.razao)
     validos = recorte.dropna(subset=["razao"])
     if validos.empty:
-        st.info("A razão fica indefinida para grupos sem admissões.")
+        st.info("Sem admissões neste recorte, não dá para calcular a razão.")
     else:
         figura = px.bar(
             validos.sort_values("razao"), x="razao", y="grupo", color="sexo",
@@ -70,7 +70,7 @@ def turnover(dados):
         figura.update_xaxes(title="Desligamentos por admissão", rangemode="tozero")
         mostrar(figura)
         if len(validos) < len(recorte):
-            st.caption("Grupos sem admissões aparecem com razão indefinida na tabela.")
+            st.caption("Grupos sem admissões ficam fora do gráfico e aparecem em branco na tabela.")
     detalhe(recorte[["setor", "sexo", "raca", "admissoes", "desligamentos", "razao"]])
 
 
@@ -79,7 +79,7 @@ def salario(dados):
                          referencia=pd.to_numeric(dados.razao) * 100)
     validos = dados.dropna(subset=["media"])
     if validos.empty:
-        st.info("O recorte não tem salários válidos de admissão.")
+        st.info("Não há salários de admissão neste recorte.")
     else:
         figura = px.bar(
             validos.sort_values("media"), x="media", y="grupo", color="sexo", labels=ROTULOS,
@@ -97,7 +97,7 @@ def participacao(dados):
     recorte["percentual"] = pd.to_numeric(recorte.proporcao) * 100
     validos = recorte.dropna(subset=["percentual"])
     if validos.empty:
-        st.info("O fluxo selecionado tem denominador zero nos setores deste recorte.")
+        st.info("Não há movimentações neste recorte.")
     else:
         figura = px.bar(
             validos.sort_values("setor", ascending=False), x="percentual", y="setor", color="grupo",

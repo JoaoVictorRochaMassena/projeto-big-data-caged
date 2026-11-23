@@ -17,13 +17,12 @@ from dashboard.paineis import graficos
 
 
 PAINEIS = {
-    "saldo": ("Saldo mensal", "Admissões menos desligamentos, por sexo e raça/cor em cada competência."),
-    "turnover": ("Turnover setorial", "Desligamentos por admissão em cada setor, mês e grupo. A linha de referência é 1,0."),
-    "salario": ("Salário de admissão", "Média ponderada dos salários válidos de admissão. O maior valor do recorte é a referência de 100%."),
+    "saldo": ("Saldo mensal", "Admissões menos desligamentos em cada mês, por sexo e raça/cor."),
+    "turnover": ("Turnover setorial", "Quantos desligamentos houve para cada admissão. Acima da linha de 1,0, o grupo perdeu mais vagas do que ganhou."),
+    "salario": ("Salário de admissão", "Salário médio de quem foi contratado, por sexo e raça/cor. A tabela compara cada grupo com a maior média."),
     "participacao": (
         "Participação",
-        "A série de mulheres respeita o filtro de raça/cor. A série de pessoas negras (pretas e pardas) "
-        "respeita o filtro de sexo. Cada proporção usa o total de seu fluxo e setor no recorte correspondente.",
+        "Percentual de mulheres e de pessoas negras (pretas e pardas) nas admissões ou nos desligamentos de cada setor.",
     ),
 }
 TZ = ZoneInfo("America/Bahia")
@@ -75,7 +74,7 @@ def filtros(dados):
 
 def mostrar_erro():
     st.error("Não foi possível consultar o banco de dados agora.")
-    st.caption("Verifique se o serviço PostgreSQL está ativo e se a conexão desta aplicação está autorizada. Recarregue a página para tentar novamente.")
+    st.caption("Recarregue a página em alguns segundos.")
 
 
 def main():
@@ -99,7 +98,7 @@ def main():
     try:
         dados_catalogo = catalogo()
         if dados_catalogo.empty:
-            st.info("O banco ainda não tem competências disponíveis para análise.")
+            st.info("Ainda não há dados no banco.")
             return
         recorte = filtros(dados_catalogo)
         painel = st.radio(
@@ -116,12 +115,12 @@ def main():
         return
 
     if dados.empty:
-        st.info("Nenhuma movimentação para os filtros escolhidos.")
+        st.info("Nenhum dado para os filtros escolhidos.")
         return
 
     graficos[painel](dados)
     st.caption(
-        f"Fonte: Novo CAGED/MTE · arquivos MOV · última consulta para este recorte às "
+        f"Fonte: Novo CAGED/MTE · consultado às "
         f"{consultado_em:%H:%M:%S} (Bahia)."
     )
 
