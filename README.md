@@ -1,6 +1,8 @@
 # Dinâmica de Emprego Formal e Turnover Setorial
 
-Projeto de Big Data e Analytics da UCSal. **Equipe:** João Victor Rocha Massena, Luísa Garrido Matos e Marco Antônio Duarte Oliveira.
+Projeto de Big Data e Analytics da UCSal. 
+
+**Equipe:** João Victor Rocha Massena, Luísa Garrido Matos e Marco Antônio Duarte Oliveira.
 
 O painel investiga quem entra e sai do emprego formal e como o salário de admissão varia no cruzamento entre sexo e raça/cor. A análise atende à ODS 5, de igualdade de gênero, e à ODS 18 brasileira, de igualdade étnico-racial.
 
@@ -25,7 +27,7 @@ PGSSLROOTCERT=
 python -m streamlit run dashboard/app.py --server.address localhost
 ```
 
-O painel consulta diretamente o PostgreSQL já provisionado no Aiven. Alterar os filtros gera consultas parametrizadas ao banco. As capturas abaixo servem de apoio se a conexão ficar indisponível durante a apresentação.
+O painel consulta diretamente o PostgreSQL já provisionado no Aiven. Alterar os filtros gera consultas parametrizadas ao banco. As capturas abaixo servem de apoio se a conexão ficar indisponível.
 
 A publicação usa o Streamlit Community Cloud a partir deste repositório, com `dashboard/app.py` como arquivo principal e Python 3.12. Host, porta, banco, usuário `caged_dashboard`, senha e o certificado CA (`PGSSLROOTCERT_PEM`) ficam nos segredos da plataforma, fora do Git. Os IPs de saída do Streamlit Community Cloud, publicados na documentação da plataforma, foram incluídos na lista de acesso do serviço no Aiven, que continua exigindo TLS e senha.
 
@@ -88,7 +90,7 @@ O Aiven Free existente foi reconciliado com o state privado do Terraform. O ajus
 | Veracidade | Conferência de cabeçalhos, competências, SHA-256, contagens e somas. Idades inválidas permanecem em uma categoria própria e salários recusados saem da média. |
 | Valor | Recortes interseccionais tornam visíveis diferenças de participação e remuneração de entrada entre grupos e setores. |
 
-A base usa microdados públicos do MTE. A entrega publica agregados e metadados, com um recorte sem identificadores individuais e aderente à finalidade acadêmica. O pipeline preserva eventos semelhantes, pois os dados carecem de identificador para deduplicação segura. [Fonte oficial Novo CAGED/PDET](https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/microdados-rais-e-caged) · [Proveniência e hashes](dados/arquivos_origem.csv)
+A base usa microdados públicos do MTE. A entrega publica agregados e metadados, com um recorte sem identificadores individuais e de acordo com a finalidade acadêmica. O pipeline preserva eventos semelhantes, pois os dados não possuem identificadores para deduplicação segura. [Fonte oficial Novo CAGED/PDET](https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/microdados-rais-e-caged) · [Proveniência e hashes](dados/arquivos_origem.csv)
 
 ## Tratamento e justificativas
 
@@ -106,7 +108,7 @@ O R coordena o processo e o DuckDB lê um mês por vez, limitando memória e evi
 | Registros aparentemente repetidos | Não remover: podem representar eventos distintos e não há identificador individual para deduplicação segura |
 | Volume elevado | Agregar pelas dimensões de análise, conservando contagens e soma salarial para recompor indicadores |
 
-A notação científica é matematicamente válida. Sua exclusão da média é uma regra explícita desta versão, motivada pela revisão dos valores extremos encontrados; não significa que todo valor nesse formato seja incorreto. A auditoria publicada contém **21 ocorrências**, registradas em `dados/auditoria_salarios.csv` e vinculadas ao pacote por hashes.
+A notação científica é matematicamente válida. Sua exclusão da média é uma regra explícita desta versão, dada pela revisão dos valores extremos encontrados; não significa que todo valor nesse formato seja incorreto. A auditoria publicada contém **21 ocorrências**, registradas em `dados/auditoria_salarios.csv` e vinculadas ao pacote por hashes.
 
 São conferidos hashes, 12 competências, unicidade de IDs e grupos, equivalência entre eventos de origem e contagens agregadas, `saldo = admissoes - desligamentos` e os limites das contagens salariais.
 
