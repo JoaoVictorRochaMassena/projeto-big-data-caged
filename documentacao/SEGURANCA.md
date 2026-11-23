@@ -1,6 +1,6 @@
 # Gerenciamento de acessos e informações sensíveis
 
-O repositório público contém código, dados públicos agregados, metadados e exemplos de configuração. Tokens Aiven, senha PostgreSQL, certificados locais, arquivos de configuração privados, planos e estado Terraform ficam fora do Git.
+O repositório público contém código, dados públicos agregados, metadados e configuração sem credenciais. Tokens Aiven, senha PostgreSQL, certificados locais, arquivos de configuração privados, planos e estado Terraform ficam fora do Git.
 
 | Informação | Uso e armazenamento |
 | --- | --- |
@@ -22,7 +22,7 @@ O schema, tabelas e view têm privilégios de `PUBLIC` revogados. A carga inicia
 
 O painel usa `caged_dashboard`, com leitura da view e transações somente leitura. Guarde o arquivo dotenv privado fora de pastas sincronizadas e indique seu caminho em `CAGED_ENV_FILE`, ou use o cofre de segredos da hospedagem. O verificador de segredos examina o índice Git e reporta apenas caminhos de arquivos. [Permissões do painel](../sql/permissoes_dashboard.sql)
 
-O `.gitignore` exclui `.Renviron`, `.env`, `segredos/`, `*.tfvars`, `*.tfstate*`, planos, chaves, `.venv/` e caches Python. O `.env.example` e o lock do provider Terraform podem ser publicados. A exclusão pelo Git não protege arquivos já publicados anteriormente, arquivos enviados manualmente ou o armazenamento local.
+O `.gitignore` exclui `.Renviron`, `.env`, `segredos/`, `*.tfvars`, `*.tfstate*`, planos, chaves, `.venv/` e caches Python. O lock do provider Terraform pode ser publicado. A exclusão pelo Git não protege arquivos já publicados anteriormente, arquivos enviados manualmente ou o armazenamento local.
 
 O provider Aiven pode gravar credenciais retornadas pela API dentro do state, mesmo sem outputs de senha. `sensitive=true` mascara exibição; não criptografa o arquivo. Por isso, o guia usa state fora da pasta sincronizada e proíbe sua publicação. Para colaboração, usar backend remoto privado com criptografia, controle de acesso e bloqueio de estado. Não compartilhar logs completos de `TF_LOG`, JSON de state/plan, URI de conexão ou captura do painel com senhas visíveis.
 
