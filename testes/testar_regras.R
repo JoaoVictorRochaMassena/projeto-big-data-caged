@@ -1,4 +1,3 @@
-# Teste pequeno das regras, sem ler os TXT ou acessar o Aiven.
 source("codigo/00_configuracao.R")
 dbExecute(con, "CREATE TEMP TABLE bruto AS SELECT
   '202508' AS competenciamov, '1' AS regiao, '11' AS uf, '1100015' AS municipio,

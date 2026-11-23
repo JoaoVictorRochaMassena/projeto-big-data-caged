@@ -1,4 +1,3 @@
-# R fica responsavel somente pelo tratamento. Depois use codigo/executar.py.
 executar <- function() {
   args <- commandArgs(trailingOnly=TRUE)
   modo <- if (length(args)) args[[1]] else "tratamento"
